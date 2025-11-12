@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 1: Choose Color - Custom Brush Painter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: #667eea;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        .step-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .option-card {
+            background: #f8f9fa;
+            border: 3px solid transparent;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .option-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+            animation: pulse 0.4s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .option-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .color-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .option-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .step-title {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="step-header">
+            <div class="step-indicator">
+                <div class="step-dot active"></div>
+                <div class="step-dot"></div>
+                <div class="step-dot"></div>
+            </div>
+            <h1 class="step-title">Choose your brush color</h1>
+            <p class="step-description">Select a color for your custom brush</p>
+        </div>
+
+        <div class="options-grid">
+            <div class="option-card" data-color="#FF6B35" data-name="Sunset Orange">
+                <div class="color-swatch" style="background: #FF6B35;"></div>
+                <div class="option-label">Sunset Orange</div>
+            </div>
+            <div class="option-card" data-color="#0077BE" data-name="Ocean Blue">
+                <div class="color-swatch" style="background: #0077BE;"></div>
+                <div class="option-label">Ocean Blue</div>
+            </div>
+            <div class="option-card" data-color="#6BBF59" data-name="Leaf Green">
+                <div class="color-swatch" style="background: #6BBF59;"></div>
+                <div class="option-label">Leaf Green</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize localStorage for brush settings if not exists
+        if (!localStorage.getItem('brushSettings')) {
+            localStorage.setItem('brushSettings', JSON.stringify({
+                color: null,
+                colorName: null,
+                shape: null,
+                texture: null
+            }));
+        }
+
+        // Handle option card clicks
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const color = this.dataset.color;
+                const colorName = this.dataset.name;
+
+                // Remove selected class from all cards
+                document.querySelectorAll('.option-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+
+                // Add selected class to clicked card
+                this.classList.add('selected');
+
+                // Store color selection in localStorage
+                const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
+                brushSettings.color = color;
+                brushSettings.colorName = colorName;
+                localStorage.setItem('brushSettings', JSON.stringify(brushSettings));
+
+                // Navigate to step 2 after a brief delay
+                setTimeout(() => {
+                    window.location.href = 'step2.html';
+                }, 400);
+            });
+        });
+
+        // Restore previous selection if coming back from step 2
+        const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
+        if (brushSettings.color) {
+            document.querySelectorAll('.option-card').forEach(card => {
+                if (card.dataset.color === brushSettings.color) {
+                    card.classList.add('selected');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

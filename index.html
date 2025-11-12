@@ -570,7 +570,7 @@
          * - Removes selection from other options in the same step
          * - Marks clicked option as selected
          * - Stores the selection in brushSettings
-         * - Enables the Next button
+         * - Automatically advances to next step (for steps 1 and 2)
          */
         document.querySelectorAll('.option-card').forEach(card => {
             card.addEventListener('click', function() {
@@ -595,6 +595,14 @@
 
                 // Enable the Next button
                 updateNextButtonState();
+
+                // Automatically advance to next step after a brief delay (except on last step)
+                if (currentStep < totalSteps) {
+                    setTimeout(() => {
+                        currentStep++;
+                        showStep(currentStep);
+                    }, 400); // 400ms delay to show selection feedback
+                }
             });
         });
 

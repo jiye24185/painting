@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Step 1: Choose Color - Custom Brush Painter</title>
+    <title>Step 1: Choose Color</title>
     <style>
         * {
             margin: 0;
@@ -12,8 +12,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -23,128 +23,93 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
         }
 
         .step-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .step-indicator {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 24px;
         }
 
         .step-dot {
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: #ddd;
-            transition: all 0.3s ease;
+            background: #e0e0e0;
         }
 
         .step-dot.active {
-            background: #667eea;
-            width: 30px;
-            border-radius: 6px;
+            background: #000;
         }
 
         .step-title {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 24px;
+            color: #000;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .step-description {
             color: #666;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .options-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 30px 0;
+            gap: 16px;
+            margin: 0 0 40px 0;
         }
 
         .option-card {
-            background: #f8f9fa;
-            border: 3px solid transparent;
-            border-radius: 15px;
-            padding: 30px 20px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 24px 16px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
+            transition: border-color 0.2s ease;
         }
 
         .option-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border-color: #667eea;
+            border-color: #000;
         }
 
         .option-card.selected {
-            border-color: #667eea;
-            background: #f0f4ff;
-            animation: pulse 0.4s ease;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .option-card.selected::after {
-            content: '✓';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #667eea;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
+            border-color: #000;
+            border-width: 2px;
+            padding: 23px 15px;
         }
 
         .color-swatch {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            margin: 0 auto 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin: 0 auto 16px;
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .option-label {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            color: #000;
         }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-
             .options-grid {
                 grid-template-columns: 1fr;
-                gap: 15px;
+                gap: 12px;
             }
 
             .step-title {
-                font-size: 22px;
+                font-size: 20px;
             }
         }
     </style>
@@ -211,7 +176,7 @@
                 // Navigate to step 2 after a brief delay
                 setTimeout(() => {
                     window.location.href = 'step2.html';
-                }, 400);
+                }, 300);
             });
         });
 

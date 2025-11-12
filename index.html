@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Own Brush - Painting App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Step Builder Styles */
+        .step-builder {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-builder.hidden {
+            display: none;
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: #667eea;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        .step-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .option-card {
+            background: #f8f9fa;
+            border: 3px solid transparent;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .option-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Color Swatches */
+        .color-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .option-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Shape Previews */
+        .shape-preview {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shape-angular {
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 70px solid #667eea;
+        }
+
+        .shape-round {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #667eea;
+        }
+
+        .shape-rectangle {
+            width: 70px;
+            height: 50px;
+            background: #667eea;
+            border-radius: 5px;
+        }
+
+        /* Texture Previews */
+        .texture-preview {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .texture-smooth {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .texture-rough {
+            background: repeating-linear-gradient(
+                45deg,
+                #667eea,
+                #667eea 5px,
+                #764ba2 5px,
+                #764ba2 10px
+            );
+        }
+
+        .texture-dotted {
+            background: radial-gradient(circle, #667eea 2px, transparent 2px);
+            background-size: 15px 15px;
+            background-color: #764ba2;
+        }
+
+        /* Navigation Buttons */
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .btn-back:hover:not(:disabled) {
+            background: #d0d0d0;
+        }
+
+        .btn-back:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-next:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Canvas Area Styles */
+        .canvas-area {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .canvas-area.hidden {
+            display: none;
+        }
+
+        .canvas-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .canvas-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .brush-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .brush-info-item {
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .brush-info-item strong {
+            color: #333;
+        }
+
+        #paintCanvas {
+            display: block;
+            margin: 0 auto;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: crosshair;
+            touch-action: none;
+            background: white;
+        }
+
+        .canvas-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-reset {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #ee5a52;
+        }
+
+        .btn-change {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-change:hover {
+            background: #5568d3;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .step-builder,
+            .canvas-area {
+                padding: 20px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .step-title {
+                font-size: 22px;
+            }
+
+            #paintCanvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Step Builder Section -->
+        <div class="step-builder" id="stepBuilder">
+            <div class="step-header">
+                <div class="step-indicator">
+                    <div class="step-dot active" data-step="1"></div>
+                    <div class="step-dot" data-step="2"></div>
+                    <div class="step-dot" data-step="3"></div>
+                </div>
+                <h1 class="step-title" id="stepTitle">Choose your brush color</h1>
+                <p class="step-description" id="stepDescription">Select a color for your custom brush</p>
+            </div>
+
+            <!-- Step 1: Color Selection -->
+            <div class="step-content" id="step1">
+                <div class="options-grid">
+                    <div class="option-card" data-option="color" data-value="#FF6B35">
+                        <div class="color-swatch" style="background: #FF6B35;"></div>
+                        <div class="option-label">Sunset Orange</div>
+                    </div>
+                    <div class="option-card" data-option="color" data-value="#0077BE">
+                        <div class="color-swatch" style="background: #0077BE;"></div>
+                        <div class="option-label">Ocean Blue</div>
+                    </div>
+                    <div class="option-card" data-option="color" data-value="#6BBF59">
+                        <div class="color-swatch" style="background: #6BBF59;"></div>
+                        <div class="option-label">Leaf Green</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Shape Selection -->
+            <div class="step-content hidden" id="step2">
+                <div class="options-grid">
+                    <div class="option-card" data-option="shape" data-value="angular">
+                        <div class="shape-preview">
+                            <div class="shape-angular"></div>
+                        </div>
+                        <div class="option-label">Angular</div>
+                    </div>
+                    <div class="option-card" data-option="shape" data-value="round">
+                        <div class="shape-preview">
+                            <div class="shape-round"></div>
+                        </div>
+                        <div class="option-label">Round</div>
+                    </div>
+                    <div class="option-card" data-option="shape" data-value="rectangle">
+                        <div class="shape-preview">
+                            <div class="shape-rectangle"></div>
+                        </div>
+                        <div class="option-label">Rectangle</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Texture Selection -->
+            <div class="step-content hidden" id="step3">
+                <div class="options-grid">
+                    <div class="option-card" data-option="texture" data-value="smooth">
+                        <div class="texture-preview texture-smooth"></div>
+                        <div class="option-label">Smooth</div>
+                    </div>
+                    <div class="option-card" data-option="texture" data-value="rough">
+                        <div class="texture-preview texture-rough"></div>
+                        <div class="option-label">Rough / Dry</div>
+                    </div>
+                    <div class="option-card" data-option="texture" data-value="dotted">
+                        <div class="texture-preview texture-dotted"></div>
+                        <div class="option-label">Dotted</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="step-navigation">
+                <button class="btn btn-back" id="btnBack" disabled>Back</button>
+                <button class="btn btn-next" id="btnNext" disabled>Next</button>
+            </div>
+        </div>
+
+        <!-- Canvas Drawing Area -->
+        <div class="canvas-area hidden" id="canvasArea">
+            <div class="canvas-header">
+                <h2 class="canvas-title">Start Creating Your Masterpiece!</h2>
+                <div class="brush-info">
+                    <div class="brush-info-item">
+                        <strong>Color:</strong> <span id="infoColor">-</span>
+                    </div>
+                    <div class="brush-info-item">
+                        <strong>Shape:</strong> <span id="infoShape">-</span>
+                    </div>
+                    <div class="brush-info-item">
+                        <strong>Texture:</strong> <span id="infoTexture">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <canvas id="paintCanvas" width="700" height="500"></canvas>
+
+            <div class="canvas-controls">
+                <button class="btn btn-reset" id="btnReset">Reset Board</button>
+                <button class="btn btn-change" id="btnChange">Change My Brush</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // BRUSH SETTINGS STORAGE
+        // ============================================
+        // Object to store the user's custom brush configuration
+        const brushSettings = {
+            color: null,        // Hex color code
+            colorName: null,    // Display name for the color
+            shape: null,        // 'angular', 'round', or 'rectangle'
+            texture: null       // 'smooth', 'rough', or 'dotted'
+        };
+
+        // ============================================
+        // STEP NAVIGATION SYSTEM
+        // ============================================
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // Get DOM elements for navigation
+        const stepBuilder = document.getElementById('stepBuilder');
+        const canvasArea = document.getElementById('canvasArea');
+        const btnBack = document.getElementById('btnBack');
+        const btnNext = document.getElementById('btnNext');
+        const stepTitle = document.getElementById('stepTitle');
+        const stepDescription = document.getElementById('stepDescription');
+
+        // Step configuration with titles and descriptions
+        const stepConfig = {
+            1: {
+                title: 'Choose your brush color',
+                description: 'Select a color for your custom brush',
+                option: 'color'
+            },
+            2: {
+                title: 'Choose your brush shape',
+                description: 'Pick a shape that defines your brush style',
+                option: 'shape'
+            },
+            3: {
+                title: 'Choose your brush texture',
+                description: 'Select how your brush strokes will appear',
+                option: 'texture'
+            }
+        };
+
+        // Color name mapping for display
+        const colorNames = {
+            '#FF6B35': 'Sunset Orange',
+            '#0077BE': 'Ocean Blue',
+            '#6BBF59': 'Leaf Green'
+        };
+
+        /**
+         * Updates the UI to show the current step
+         * - Hides all step contents
+         * - Shows the current step content
+         * - Updates step indicators (dots)
+         * - Updates step title and description
+         * - Updates button states
+         */
+        function showStep(step) {
+            // Hide all step contents
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Show current step content
+            document.getElementById(`step${step}`).classList.remove('hidden');
+
+            // Update step indicator dots
+            document.querySelectorAll('.step-dot').forEach((dot, index) => {
+                if (index + 1 === step) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Update title and description
+            stepTitle.textContent = stepConfig[step].title;
+            stepDescription.textContent = stepConfig[step].description;
+
+            // Update Back button state
+            btnBack.disabled = (step === 1);
+
+            // Update Next button text and check if option is selected
+            if (step === totalSteps) {
+                btnNext.textContent = 'Start Drawing!';
+            } else {
+                btnNext.textContent = 'Next';
+            }
+
+            // Check if current step has a selection to enable Next button
+            updateNextButtonState();
+        }
+
+        /**
+         * Enables or disables the Next button based on current step selection
+         */
+        function updateNextButtonState() {
+            const currentOption = stepConfig[currentStep].option;
+            const hasSelection = brushSettings[currentOption] !== null;
+            btnNext.disabled = !hasSelection;
+        }
+
+        // ============================================
+        // OPTION SELECTION HANDLING
+        // ============================================
+        /**
+         * Handles clicking on option cards
+         * - Removes selection from other options in the same step
+         * - Marks clicked option as selected
+         * - Stores the selection in brushSettings
+         * - Enables the Next button
+         */
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const optionType = this.dataset.option;
+                const optionValue = this.dataset.value;
+
+                // Remove selected class from all cards of this option type
+                document.querySelectorAll(`[data-option="${optionType}"]`).forEach(c => {
+                    c.classList.remove('selected');
+                });
+
+                // Add selected class to clicked card
+                this.classList.add('selected');
+
+                // Store the selection in brushSettings
+                if (optionType === 'color') {
+                    brushSettings.color = optionValue;
+                    brushSettings.colorName = colorNames[optionValue];
+                } else {
+                    brushSettings[optionType] = optionValue;
+                }
+
+                // Enable the Next button
+                updateNextButtonState();
+            });
+        });
+
+        // ============================================
+        // NAVIGATION BUTTON HANDLERS
+        // ============================================
+        /**
+         * Back button: Go to previous step
+         */
+        btnBack.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        /**
+         * Next button: Go to next step or start drawing
+         */
+        btnNext.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            } else {
+                // All steps completed, show canvas
+                startDrawing();
+            }
+        });
+
+        /**
+         * Transitions from step builder to canvas area
+         * - Hides step builder
+         * - Shows canvas area
+         * - Updates brush info display
+         * - Initializes canvas
+         */
+        function startDrawing() {
+            stepBuilder.classList.add('hidden');
+            canvasArea.classList.remove('hidden');
+
+            // Update brush info display
+            document.getElementById('infoColor').textContent = brushSettings.colorName;
+            document.getElementById('infoShape').textContent =
+                brushSettings.shape.charAt(0).toUpperCase() + brushSettings.shape.slice(1);
+            document.getElementById('infoTexture').textContent =
+                brushSettings.texture.charAt(0).toUpperCase() + brushSettings.texture.slice(1);
+
+            // Initialize canvas if not already done
+            if (!canvas.hasAttribute('data-initialized')) {
+                initCanvas();
+                canvas.setAttribute('data-initialized', 'true');
+            }
+        }
+
+        // ============================================
+        // CANVAS BUTTON HANDLERS
+        // ============================================
+        /**
+         * Reset Board: Clear the entire canvas
+         */
+        document.getElementById('btnReset').addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        /**
+         * Change My Brush: Return to step 1
+         * - Hides canvas area
+         * - Shows step builder
+         * - Resets to step 1
+         */
+        document.getElementById('btnChange').addEventListener('click', () => {
+            canvasArea.classList.add('hidden');
+            stepBuilder.classList.remove('hidden');
+            currentStep = 1;
+            showStep(currentStep);
+        });
+
+        // ============================================
+        // CANVAS DRAWING IMPLEMENTATION
+        // ============================================
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        // Brush size configuration
+        const brushSize = 20;
+
+        /**
+         * Initializes canvas event listeners for mouse and touch
+         */
+        function initCanvas() {
+            // Mouse events
+            canvas.addEventListener('mousedown', startDrawingEvent);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            // Touch events for mobile devices
+            canvas.addEventListener('touchstart', handleTouchStart);
+            canvas.addEventListener('touchmove', handleTouchMove);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        /**
+         * Starts drawing when mouse button is pressed
+         */
+        function startDrawingEvent(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+        }
+
+        /**
+         * Handles touch start event
+         */
+        function handleTouchStart(e) {
+            e.preventDefault();
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            lastX = touch.clientX - rect.left;
+            lastY = touch.clientY - rect.top;
+        }
+
+        /**
+         * Handles touch move event
+         */
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!isDrawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            drawBrushStroke(x, y);
+            lastX = x;
+            lastY = y;
+        }
+
+        /**
+         * Stops drawing when mouse button is released
+         */
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        /**
+         * Main drawing function called on mouse/touch move
+         */
+        function draw(e) {
+            if (!isDrawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            drawBrushStroke(x, y);
+
+            lastX = x;
+            lastY = y;
+        }
+
+        /**
+         * Draws a brush stroke from last position to current position
+         * Applies the custom brush settings (color, shape, texture)
+         */
+        function drawBrushStroke(x, y) {
+            // Calculate distance for interpolation (to create smooth lines)
+            const distance = Math.sqrt((x - lastX) ** 2 + (y - lastY) ** 2);
+            const steps = Math.max(1, Math.floor(distance / 5));
+
+            // Draw interpolated stamps along the path
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps;
+                const interpX = lastX + (x - lastX) * t;
+                const interpY = lastY + (y - lastY) * t;
+
+                // Apply texture-specific rendering
+                switch (brushSettings.texture) {
+                    case 'smooth':
+                        drawSmoothStamp(interpX, interpY);
+                        break;
+                    case 'rough':
+                        drawRoughStamp(interpX, interpY);
+                        break;
+                    case 'dotted':
+                        // Only draw dots at intervals for dotted texture
+                        if (i % 3 === 0) {
+                            drawDottedStamp(interpX, interpY);
+                        }
+                        break;
+                }
+            }
+        }
+
+        /**
+         * SMOOTH TEXTURE: Normal brush with full opacity
+         */
+        function drawSmoothStamp(x, y) {
+            ctx.fillStyle = brushSettings.color;
+            ctx.globalAlpha = 0.8;
+            drawShape(x, y, brushSize);
+            ctx.globalAlpha = 1.0;
+        }
+
+        /**
+         * ROUGH TEXTURE: Varied opacity and jittered position for rough appearance
+         */
+        function drawRoughStamp(x, y) {
+            // Random opacity variation
+            ctx.globalAlpha = 0.3 + Math.random() * 0.4;
+            ctx.fillStyle = brushSettings.color;
+
+            // Draw multiple stamps with slight position jitter
+            for (let i = 0; i < 3; i++) {
+                const jitterX = x + (Math.random() - 0.5) * brushSize * 0.5;
+                const jitterY = y + (Math.random() - 0.5) * brushSize * 0.5;
+                const jitterSize = brushSize * (0.7 + Math.random() * 0.3);
+                drawShape(jitterX, jitterY, jitterSize);
+            }
+
+            ctx.globalAlpha = 1.0;
+        }
+
+        /**
+         * DOTTED TEXTURE: Spaced dots along the stroke path
+         */
+        function drawDottedStamp(x, y) {
+            ctx.fillStyle = brushSettings.color;
+            ctx.globalAlpha = 0.9;
+            drawShape(x, y, brushSize * 0.8);
+            ctx.globalAlpha = 1.0;
+        }
+
+        /**
+         * Draws the actual shape based on brush shape setting
+         * @param {number} x - X coordinate
+         * @param {number} y - Y coordinate
+         * @param {number} size - Size of the shape
+         */
+        function drawShape(x, y, size) {
+            ctx.save();
+
+            switch (brushSettings.shape) {
+                case 'round':
+                    // Draw a circle
+                    ctx.beginPath();
+                    ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+
+                case 'angular':
+                    // Draw a triangle
+                    ctx.beginPath();
+                    ctx.moveTo(x, y - size / 2);
+                    ctx.lineTo(x - size / 2, y + size / 2);
+                    ctx.lineTo(x + size / 2, y + size / 2);
+                    ctx.closePath();
+                    ctx.fill();
+                    break;
+
+                case 'rectangle':
+                    // Draw a rectangle
+                    ctx.fillRect(x - size / 2, y - size / 2, size, size * 0.7);
+                    break;
+            }
+
+            ctx.restore();
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        // Show the first step when page loads
+        showStep(1);
+    </script>
+</body>
+</html>

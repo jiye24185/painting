@@ -408,6 +408,38 @@
             tempCanvas.height = canvas.height;
             const tempCtx = tempCanvas.getContext('2d');
 
+            // Apply clipping path based on canvas shape
+            tempCtx.save();
+
+            const shape = settings.canvasShape;
+            if (shape === 'circle') {
+                // Circle clipping
+                tempCtx.beginPath();
+                tempCtx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, Math.PI * 2);
+                tempCtx.clip();
+            } else if (shape === 'star') {
+                // Star clipping - convert percentage polygon to absolute coordinates
+                const w = canvas.width;
+                const h = canvas.height;
+                const starPoints = [
+                    [0.50, 0.05], [0.61, 0.40], [0.98, 0.40], [0.68, 0.62],
+                    [0.79, 0.95], [0.50, 0.75], [0.21, 0.95], [0.32, 0.62],
+                    [0.02, 0.40], [0.39, 0.40]
+                ];
+                tempCtx.beginPath();
+                tempCtx.moveTo(starPoints[0][0] * w, starPoints[0][1] * h);
+                for (let i = 1; i < starPoints.length; i++) {
+                    tempCtx.lineTo(starPoints[i][0] * w, starPoints[i][1] * h);
+                }
+                tempCtx.closePath();
+                tempCtx.clip();
+            } else if (shape === 'heart') {
+                // Heart clipping using Path2D
+                const heartPath = new Path2D('M 250,100 C 200,50 100,50 100,150 C 100,250 250,350 250,350 C 250,350 400,250 400,150 C 400,50 300,50 250,100');
+                tempCtx.clip(heartPath);
+            }
+            // Square doesn't need clipping
+
             // Apply texture background
             const textureColors = {
                 'Texturelabs_Paper_150S.jpg': '#C89968',
@@ -419,6 +451,8 @@
 
             // Draw the actual canvas content
             tempCtx.drawImage(canvas, 0, 0);
+
+            tempCtx.restore();
 
             // Download
             tempCanvas.toBlob((blob) => {

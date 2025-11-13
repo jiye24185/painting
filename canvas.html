@@ -68,6 +68,36 @@
             max-width: 100%;
         }
 
+        /* Canvas shape clip paths */
+        #paintCanvas.shape-square {
+            clip-path: none;
+        }
+
+        #paintCanvas.shape-circle {
+            clip-path: circle(50%);
+        }
+
+        #paintCanvas.shape-star {
+            clip-path: polygon(
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
+            );
+        }
+
+        #paintCanvas.shape-heart {
+            clip-path: path('M 250,100 C 200,50 100,50 100,150 C 100,250 250,350 250,350 C 250,350 400,250 400,150 C 400,50 300,50 250,100');
+            width: 500px;
+            height: 450px;
+        }
+
         .canvas-controls {
             display: flex;
             justify-content: center;
@@ -103,6 +133,14 @@
             border-color: #000;
         }
 
+        .btn-restart {
+            color: #000;
+        }
+
+        .btn-restart:hover {
+            border-color: #000;
+        }
+
         .btn-change {
             background: #000;
             color: #fff;
@@ -135,6 +173,9 @@
             <h2 class="canvas-title">Start creating your masterpiece</h2>
             <div class="brush-info">
                 <div class="brush-info-item">
+                    <strong>Canvas:</strong> <span id="infoCanvas">-</span>
+                </div>
+                <div class="brush-info-item">
                     <strong>Brush Color:</strong> <span id="infoColor">-</span>
                 </div>
                 <div class="brush-info-item">
@@ -146,11 +187,12 @@
             </div>
         </div>
 
-        <canvas id="paintCanvas" width="740" height="500"></canvas>
+        <canvas id="paintCanvas" width="500" height="500"></canvas>
 
         <div class="canvas-controls">
             <button class="btn btn-reset" id="btnReset">Clear Canvas</button>
             <button class="btn btn-save" id="btnSave">Save Drawing</button>
+            <button class="btn btn-restart" id="btnRestart">Restart</button>
             <button class="btn btn-change" id="btnChange">Change Brush</button>
         </div>
     </div>
@@ -162,11 +204,12 @@
         const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
 
         // Redirect to step 1 if brush settings are incomplete
-        if (!brushSettings || !brushSettings.color || !brushSettings.shape || !brushSettings.paperColor) {
+        if (!brushSettings || !brushSettings.canvasShape || !brushSettings.color || !brushSettings.shape || !brushSettings.paperColor) {
             window.location.href = 'step1.html';
         }
 
         // Display brush information
+        document.getElementById('infoCanvas').textContent = brushSettings.canvasShapeName;
         document.getElementById('infoColor').textContent = brushSettings.colorName;
         document.getElementById('infoShape').textContent =
             brushSettings.shape.charAt(0).toUpperCase() + brushSettings.shape.slice(1);
@@ -177,6 +220,9 @@
         // ============================================
         const canvas = document.getElementById('paintCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Apply canvas shape clip-path
+        canvas.classList.add('shape-' + brushSettings.canvasShape);
 
         // Set canvas background to paper color
         canvas.style.background = brushSettings.paperColor;
@@ -369,7 +415,17 @@
         });
 
         /**
-         * Change Brush: Return to step 1
+         * Restart: Clear localStorage and return to step 1
+         */
+        document.getElementById('btnRestart').addEventListener('click', () => {
+            if (confirm('This will clear your current drawing and start over. Are you sure?')) {
+                localStorage.removeItem('brushSettings');
+                window.location.href = 'step1.html';
+            }
+        });
+
+        /**
+         * Change Brush: Return to step 1 (keeping current settings)
          */
         document.getElementById('btnChange').addEventListener('click', () => {
             window.location.href = 'step1.html';

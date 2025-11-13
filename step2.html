@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Step 2: Choose Shape</title>
+    <title>Step 2: Choose Brush Color</title>
     <style>
         * {
             margin: 0;
@@ -88,34 +88,12 @@
             padding: 23px 15px;
         }
 
-        .shape-preview {
+        .color-swatch {
             width: 60px;
             height: 60px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .shape-angular {
-            width: 0;
-            height: 0;
-            border-left: 25px solid transparent;
-            border-right: 25px solid transparent;
-            border-bottom: 45px solid #000;
-        }
-
-        .shape-round {
-            width: 45px;
-            height: 45px;
             border-radius: 50%;
-            background: #000;
-        }
-
-        .shape-rectangle {
-            width: 45px;
-            height: 35px;
-            background: #000;
+            margin: 0 auto 16px;
+            border: 1px solid rgba(0,0,0,0.1);
         }
 
         .option-label {
@@ -167,29 +145,24 @@
                 <div class="step-dot"></div>
                 <div class="step-dot active"></div>
                 <div class="step-dot"></div>
+                <div class="step-dot"></div>
             </div>
-            <h1 class="step-title">Choose your brush shape</h1>
-            <p class="step-description">Pick a shape that defines your brush style</p>
+            <h1 class="step-title">Choose your brush color</h1>
+            <p class="step-description">Select a color for your custom brush</p>
         </div>
 
         <div class="options-grid">
-            <div class="option-card" data-shape="angular">
-                <div class="shape-preview">
-                    <div class="shape-angular"></div>
-                </div>
-                <div class="option-label">Angular</div>
+            <div class="option-card" data-color="#FF6B35" data-name="Sunset Orange">
+                <div class="color-swatch" style="background: #FF6B35;"></div>
+                <div class="option-label">Sunset Orange</div>
             </div>
-            <div class="option-card" data-shape="round">
-                <div class="shape-preview">
-                    <div class="shape-round"></div>
-                </div>
-                <div class="option-label">Round</div>
+            <div class="option-card" data-color="#0077BE" data-name="Ocean Blue">
+                <div class="color-swatch" style="background: #0077BE;"></div>
+                <div class="option-label">Ocean Blue</div>
             </div>
-            <div class="option-card" data-shape="rectangle">
-                <div class="shape-preview">
-                    <div class="shape-rectangle"></div>
-                </div>
-                <div class="option-label">Rectangle</div>
+            <div class="option-card" data-color="#6BBF59" data-name="Leaf Green">
+                <div class="color-swatch" style="background: #6BBF59;"></div>
+                <div class="option-label">Leaf Green</div>
             </div>
         </div>
 
@@ -199,17 +172,18 @@
     </div>
 
     <script>
-        // Check if user has selected color in step 1
+        // Check if user has selected canvas shape in step 1
         const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
-        if (!brushSettings || !brushSettings.color) {
-            // Redirect back to step 1 if no color selected
+        if (!brushSettings || !brushSettings.canvasShape) {
+            // Redirect back to step 1 if no canvas shape selected
             window.location.href = 'step1.html';
         }
 
         // Handle option card clicks
         document.querySelectorAll('.option-card').forEach(card => {
             card.addEventListener('click', function() {
-                const shape = this.dataset.shape;
+                const color = this.dataset.color;
+                const colorName = this.dataset.name;
 
                 // Remove selected class from all cards
                 document.querySelectorAll('.option-card').forEach(c => {
@@ -219,9 +193,10 @@
                 // Add selected class to clicked card
                 this.classList.add('selected');
 
-                // Store shape selection in localStorage
+                // Store color selection in localStorage
                 const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
-                brushSettings.shape = shape;
+                brushSettings.color = color;
+                brushSettings.colorName = colorName;
                 localStorage.setItem('brushSettings', JSON.stringify(brushSettings));
 
                 // Navigate to step 3 after a brief delay
@@ -232,9 +207,9 @@
         });
 
         // Restore previous selection if coming back from step 3
-        if (brushSettings.shape) {
+        if (brushSettings.color) {
             document.querySelectorAll('.option-card').forEach(card => {
-                if (card.dataset.shape === brushSettings.shape) {
+                if (card.dataset.color === brushSettings.color) {
                     card.classList.add('selected');
                 }
             });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Step 3: Choose Brush Shape</title>
+    <title>Step 4: Choose Paper Color</title>
     <style>
         * {
             margin: 0;
@@ -88,34 +88,12 @@
             padding: 23px 15px;
         }
 
-        .shape-preview {
+        .paper-swatch {
             width: 60px;
             height: 60px;
             margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .shape-angular {
-            width: 0;
-            height: 0;
-            border-left: 25px solid transparent;
-            border-right: 25px solid transparent;
-            border-bottom: 45px solid #000;
-        }
-
-        .shape-round {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #000;
-        }
-
-        .shape-rectangle {
-            width: 45px;
-            height: 35px;
-            background: #000;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 4px;
         }
 
         .option-label {
@@ -166,31 +144,25 @@
             <div class="step-indicator">
                 <div class="step-dot"></div>
                 <div class="step-dot"></div>
-                <div class="step-dot active"></div>
                 <div class="step-dot"></div>
+                <div class="step-dot active"></div>
             </div>
-            <h1 class="step-title">Choose your brush shape</h1>
-            <p class="step-description">Pick a shape that defines your brush style</p>
+            <h1 class="step-title">Choose your paper color</h1>
+            <p class="step-description">Select a background color for your canvas</p>
         </div>
 
         <div class="options-grid">
-            <div class="option-card" data-shape="angular">
-                <div class="shape-preview">
-                    <div class="shape-angular"></div>
-                </div>
-                <div class="option-label">Angular</div>
+            <div class="option-card" data-paper="#FFFFFF" data-name="White">
+                <div class="paper-swatch" style="background: #FFFFFF;"></div>
+                <div class="option-label">White</div>
             </div>
-            <div class="option-card" data-shape="round">
-                <div class="shape-preview">
-                    <div class="shape-round"></div>
-                </div>
-                <div class="option-label">Round</div>
+            <div class="option-card" data-paper="#FFF8DC" data-name="Cream">
+                <div class="paper-swatch" style="background: #FFF8DC;"></div>
+                <div class="option-label">Cream</div>
             </div>
-            <div class="option-card" data-shape="rectangle">
-                <div class="shape-preview">
-                    <div class="shape-rectangle"></div>
-                </div>
-                <div class="option-label">Rectangle</div>
+            <div class="option-card" data-paper="#E8E8E8" data-name="Light Gray">
+                <div class="paper-swatch" style="background: #E8E8E8;"></div>
+                <div class="option-label">Light Gray</div>
             </div>
         </div>
 
@@ -202,7 +174,7 @@
     <script>
         // Check if user has completed previous steps
         const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
-        if (!brushSettings || !brushSettings.canvasShape || !brushSettings.color) {
+        if (!brushSettings || !brushSettings.canvasShape || !brushSettings.color || !brushSettings.shape) {
             // Redirect back to step 1 if previous steps not completed
             window.location.href = 'step1.html';
         }
@@ -210,7 +182,8 @@
         // Handle option card clicks
         document.querySelectorAll('.option-card').forEach(card => {
             card.addEventListener('click', function() {
-                const shape = this.dataset.shape;
+                const paperColor = this.dataset.paper;
+                const paperName = this.dataset.name;
 
                 // Remove selected class from all cards
                 document.querySelectorAll('.option-card').forEach(c => {
@@ -220,22 +193,23 @@
                 // Add selected class to clicked card
                 this.classList.add('selected');
 
-                // Store shape selection in localStorage
+                // Store paper color selection in localStorage
                 const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
-                brushSettings.shape = shape;
+                brushSettings.paperColor = paperColor;
+                brushSettings.paperName = paperName;
                 localStorage.setItem('brushSettings', JSON.stringify(brushSettings));
 
-                // Navigate to step 4 after a brief delay
+                // Navigate to canvas after a brief delay
                 setTimeout(() => {
-                    window.location.href = 'step4.html';
+                    window.location.href = 'canvas.html';
                 }, 300);
             });
         });
 
-        // Restore previous selection if coming back from step 4
-        if (brushSettings.shape) {
+        // Restore previous selection if coming back from canvas
+        if (brushSettings.paperColor) {
             document.querySelectorAll('.option-card').forEach(card => {
-                if (card.dataset.shape === brushSettings.shape) {
+                if (card.dataset.paper === brushSettings.paperColor) {
                     card.classList.add('selected');
                 }
             });
@@ -243,7 +217,7 @@
 
         // Back button handler
         document.getElementById('btnBack').addEventListener('click', () => {
-            window.location.href = 'step2.html';
+            window.location.href = 'step3.html';
         });
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Step 1: Choose Color</title>
+    <title>Step 1: Choose Canvas Shape</title>
     <style>
         * {
             margin: 0;
@@ -23,7 +23,7 @@
 
         .container {
             width: 100%;
-            max-width: 700px;
+            max-width: 800px;
         }
 
         .step-header {
@@ -63,7 +63,7 @@
 
         .options-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 16px;
             margin: 0 0 40px 0;
         }
@@ -72,7 +72,7 @@
             background: #fff;
             border: 1px solid #e0e0e0;
             border-radius: 4px;
-            padding: 24px 16px;
+            padding: 40px 20px;
             text-align: center;
             cursor: pointer;
             transition: border-color 0.2s ease;
@@ -85,15 +85,79 @@
         .option-card.selected {
             border-color: #000;
             border-width: 2px;
-            padding: 23px 15px;
+            padding: 39px 19px;
         }
 
-        .color-swatch {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
+        .shape-preview {
+            width: 80px;
+            height: 80px;
             margin: 0 auto 16px;
-            border: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .canvas-square {
+            width: 70px;
+            height: 70px;
+            background: #000;
+        }
+
+        .canvas-star {
+            width: 0;
+            height: 0;
+            position: relative;
+            border-left: 35px solid transparent;
+            border-right: 35px solid transparent;
+            border-bottom: 70px solid #000;
+        }
+
+        .canvas-star::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 35px solid transparent;
+            border-right: 35px solid transparent;
+            border-top: 70px solid #000;
+            top: 30px;
+            left: -35px;
+        }
+
+        .canvas-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #000;
+        }
+
+        .canvas-heart {
+            position: relative;
+            width: 70px;
+            height: 70px;
+        }
+
+        .canvas-heart::before,
+        .canvas-heart::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            width: 35px;
+            height: 56px;
+            background: #000;
+            border-radius: 35px 35px 0 0;
+        }
+
+        .canvas-heart::before {
+            left: 35px;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .canvas-heart::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
         }
 
         .option-label {
@@ -121,23 +185,36 @@
                 <div class="step-dot active"></div>
                 <div class="step-dot"></div>
                 <div class="step-dot"></div>
+                <div class="step-dot"></div>
             </div>
-            <h1 class="step-title">Choose your brush color</h1>
-            <p class="step-description">Select a color for your custom brush</p>
+            <h1 class="step-title">Choose your canvas shape</h1>
+            <p class="step-description">Select the shape of your drawing canvas</p>
         </div>
 
         <div class="options-grid">
-            <div class="option-card" data-color="#FF6B35" data-name="Sunset Orange">
-                <div class="color-swatch" style="background: #FF6B35;"></div>
-                <div class="option-label">Sunset Orange</div>
+            <div class="option-card" data-shape="square" data-name="Square">
+                <div class="shape-preview">
+                    <div class="canvas-square"></div>
+                </div>
+                <div class="option-label">Square</div>
             </div>
-            <div class="option-card" data-color="#0077BE" data-name="Ocean Blue">
-                <div class="color-swatch" style="background: #0077BE;"></div>
-                <div class="option-label">Ocean Blue</div>
+            <div class="option-card" data-shape="star" data-name="Star">
+                <div class="shape-preview">
+                    <div class="canvas-star"></div>
+                </div>
+                <div class="option-label">Star</div>
             </div>
-            <div class="option-card" data-color="#6BBF59" data-name="Leaf Green">
-                <div class="color-swatch" style="background: #6BBF59;"></div>
-                <div class="option-label">Leaf Green</div>
+            <div class="option-card" data-shape="circle" data-name="Circle">
+                <div class="shape-preview">
+                    <div class="canvas-circle"></div>
+                </div>
+                <div class="option-label">Circle</div>
+            </div>
+            <div class="option-card" data-shape="heart" data-name="Heart">
+                <div class="shape-preview">
+                    <div class="canvas-heart"></div>
+                </div>
+                <div class="option-label">Heart</div>
             </div>
         </div>
     </div>
@@ -146,6 +223,8 @@
         // Initialize localStorage for brush settings if not exists
         if (!localStorage.getItem('brushSettings')) {
             localStorage.setItem('brushSettings', JSON.stringify({
+                canvasShape: null,
+                canvasShapeName: null,
                 color: null,
                 colorName: null,
                 shape: null,
@@ -157,8 +236,8 @@
         // Handle option card clicks
         document.querySelectorAll('.option-card').forEach(card => {
             card.addEventListener('click', function() {
-                const color = this.dataset.color;
-                const colorName = this.dataset.name;
+                const canvasShape = this.dataset.shape;
+                const canvasShapeName = this.dataset.name;
 
                 // Remove selected class from all cards
                 document.querySelectorAll('.option-card').forEach(c => {
@@ -168,10 +247,10 @@
                 // Add selected class to clicked card
                 this.classList.add('selected');
 
-                // Store color selection in localStorage
+                // Store canvas shape selection in localStorage
                 const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
-                brushSettings.color = color;
-                brushSettings.colorName = colorName;
+                brushSettings.canvasShape = canvasShape;
+                brushSettings.canvasShapeName = canvasShapeName;
                 localStorage.setItem('brushSettings', JSON.stringify(brushSettings));
 
                 // Navigate to step 2 after a brief delay
@@ -183,9 +262,9 @@
 
         // Restore previous selection if coming back from step 2
         const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
-        if (brushSettings.color) {
+        if (brushSettings && brushSettings.canvasShape) {
             document.querySelectorAll('.option-card').forEach(card => {
-                if (card.dataset.color === brushSettings.color) {
+                if (card.dataset.shape === brushSettings.canvasShape) {
                     card.classList.add('selected');
                 }
             });

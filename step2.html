@@ -114,6 +114,34 @@
             background-color: #F5F5F5;
         }
 
+        /* Canvas shape clip paths for texture previews */
+        .texture-preview.shape-square {
+            clip-path: none;
+        }
+
+        .texture-preview.shape-circle {
+            clip-path: circle(50%);
+        }
+
+        .texture-preview.shape-star {
+            clip-path: polygon(
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
+            );
+        }
+
+        .texture-preview.shape-heart {
+            clip-path: path('M 250,100 C 200,50 100,50 100,150 C 100,250 250,350 250,350 C 250,350 400,250 400,150 C 400,50 300,50 250,100');
+        }
+
         .option-label {
             font-size: 14px;
             font-weight: 500;
@@ -194,6 +222,12 @@
             // Redirect back to step 1 if no canvas shape selected
             window.location.href = 'step1.html';
         }
+
+        // Apply the selected canvas shape to all texture previews
+        const selectedShape = brushSettings.canvasShape;
+        document.querySelectorAll('.texture-preview').forEach(preview => {
+            preview.classList.add(`shape-${selectedShape}`);
+        });
 
         // Handle option card clicks
         document.querySelectorAll('.option-card').forEach(card => {

@@ -26,9 +26,30 @@
             max-width: 900px;
         }
 
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-back-arrow {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+            margin-right: 16px;
+        }
+
+        .btn-back-arrow:hover {
+            border-color: #000;
+        }
+
         .canvas-header {
             text-align: center;
-            margin-bottom: 20px;
+            flex: 1;
         }
 
         .canvas-title {
@@ -277,14 +298,17 @@
 </head>
 <body>
     <div class="container">
-        <div class="canvas-header">
-            <h2 class="canvas-title">Start creating your masterpiece</h2>
-            <div class="canvas-info">
-                <div class="info-item">
-                    <strong>Canvas:</strong> <span id="infoCanvas">-</span>
-                </div>
-                <div class="info-item">
-                    <strong>Paper:</strong> <span id="infoPaper">-</span>
+        <div class="page-header">
+            <button class="btn-back-arrow" id="btnBackArrow">← Back</button>
+            <div class="canvas-header">
+                <h2 class="canvas-title">Start creating your masterpiece</h2>
+                <div class="canvas-info">
+                    <div class="info-item">
+                        <strong>Canvas:</strong> <span id="infoCanvas">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Paper:</strong> <span id="infoPaper">-</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -331,9 +355,7 @@
 
         <div class="canvas-controls">
             <button class="btn" id="btnClear">Clear Canvas</button>
-            <button class="btn" id="btnSave">Save Drawing</button>
-            <button class="btn" id="btnRestart">Restart</button>
-            <button class="btn btn-primary" id="btnChange">Change Settings</button>
+            <button class="btn btn-primary" id="btnNext">Next: Add Text →</button>
         </div>
     </div>
 
@@ -518,51 +540,23 @@
         // ============================================
         // ACTION BUTTONS
         // ============================================
+        document.getElementById('btnBackArrow').addEventListener('click', () => {
+            window.location.href = 'step2.html';
+        });
+
         document.getElementById('btnClear').addEventListener('click', () => {
             if (confirm('Clear the entire canvas?')) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
         });
 
-        document.getElementById('btnSave').addEventListener('click', () => {
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = canvas.width;
-            tempCanvas.height = canvas.height;
-            const tempCtx = tempCanvas.getContext('2d');
+        document.getElementById('btnNext').addEventListener('click', () => {
+            // Save canvas drawing to localStorage
+            const canvasData = canvas.toDataURL('image/png');
+            localStorage.setItem('canvasDrawing', canvasData);
 
-            // Apply texture background
-            const textureColors = {
-                'Texturelabs_Paper_150S.jpg': '#C89968',
-                'Texturelabs_Paper_237S.jpg': '#F8F8F8',
-                'Texturelabs_Paper_300S.jpg': '#F5F5F5'
-            };
-            tempCtx.fillStyle = textureColors[settings.paperTexture] || '#FFFFFF';
-            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-            // Draw the actual canvas content
-            tempCtx.drawImage(canvas, 0, 0);
-
-            // Download
-            tempCanvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-                link.download = `my-painting-${timestamp}.png`;
-                link.href = url;
-                link.click();
-                URL.revokeObjectURL(url);
-            });
-        });
-
-        document.getElementById('btnRestart').addEventListener('click', () => {
-            if (confirm('This will clear your current drawing and start over. Are you sure?')) {
-                localStorage.removeItem('brushSettings');
-                window.location.href = 'step1.html';
-            }
-        });
-
-        document.getElementById('btnChange').addEventListener('click', () => {
-            window.location.href = 'step1.html';
+            // Navigate to text page
+            window.location.href = 'text.html';
         });
     </script>
 </body>

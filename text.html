@@ -244,7 +244,7 @@
             <button class="btn-back-arrow" id="btnBackArrow">← Back</button>
             <div class="text-header">
                 <h2 class="text-title">Add text to your card</h2>
-                <p class="text-description">Click on the canvas to add text</p>
+                <p class="text-description">Type to see text on canvas • Click canvas to reposition • Click button to place</p>
             </div>
         </div>
 
@@ -324,51 +324,105 @@
 
         // Store texts added to canvas
         let textElements = [];
+        let liveTextSettings = {
+            text: '',
+            fontSize: 30,
+            color: '#000000',
+            x: canvas.width / 2,
+            y: canvas.height / 2
+        };
+
+        // Function to redraw canvas with all elements
+        function redrawCanvas() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Reload the original drawing
+            const img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+
+                // Draw all finalized text elements
+                textElements.forEach(textEl => {
+                    ctx.font = `${textEl.fontSize}px Arial`;
+                    ctx.fillStyle = textEl.color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(textEl.text, textEl.x, textEl.y);
+                });
+
+                // Draw live preview text
+                if (liveTextSettings.text) {
+                    ctx.font = `${liveTextSettings.fontSize}px Arial`;
+                    ctx.fillStyle = liveTextSettings.color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(liveTextSettings.text, liveTextSettings.x, liveTextSettings.y);
+                }
+            };
+            img.src = canvasData;
+        }
 
         // ============================================
         // TEXT INPUT FUNCTIONALITY
         // ============================================
-        document.getElementById('btnAddText').addEventListener('click', addTextToCanvas);
+        const textInput = document.getElementById('textInput');
+        const fontSizeInput = document.getElementById('fontSizeInput');
+        const textColorInput = document.getElementById('textColorInput');
 
-        document.getElementById('textInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addTextToCanvas();
+        // Update live text as user types
+        textInput.addEventListener('input', function() {
+            liveTextSettings.text = this.value;
+            liveTextSettings.fontSize = parseInt(fontSizeInput.value);
+            liveTextSettings.color = textColorInput.value;
+            redrawCanvas();
+        });
+
+        // Update live text when font size changes
+        fontSizeInput.addEventListener('input', function() {
+            liveTextSettings.fontSize = parseInt(this.value);
+            if (liveTextSettings.text) {
+                redrawCanvas();
             }
         });
 
-        function addTextToCanvas() {
-            const text = document.getElementById('textInput').value.trim();
-            if (!text) {
+        // Update live text when color changes
+        textColorInput.addEventListener('input', function() {
+            liveTextSettings.color = this.value;
+            if (liveTextSettings.text) {
+                redrawCanvas();
+            }
+        });
+
+        // ============================================
+        // ADD TEXT BUTTON - Finalize current text
+        // ============================================
+        document.getElementById('btnAddText').addEventListener('click', function() {
+            if (!liveTextSettings.text) {
                 alert('Please enter some text');
                 return;
             }
 
-            const fontSize = parseInt(document.getElementById('fontSizeInput').value);
-            const color = document.getElementById('textColorInput').value;
+            // Finalize the current text at center position
+            textElements.push({
+                text: liveTextSettings.text,
+                fontSize: liveTextSettings.fontSize,
+                color: liveTextSettings.color,
+                x: liveTextSettings.x,
+                y: liveTextSettings.y
+            });
 
-            // Add text to center of canvas
-            const x = canvas.width / 2;
-            const y = canvas.height / 2;
-
-            ctx.font = `${fontSize}px Arial`;
-            ctx.fillStyle = color;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(text, x, y);
-
-            // Store text element
-            textElements.push({ text, fontSize, color, x, y });
-
-            // Clear input
-            document.getElementById('textInput').value = '';
-        }
+            // Clear the live text and input
+            liveTextSettings.text = '';
+            textInput.value = '';
+            redrawCanvas();
+        });
 
         // ============================================
-        // CANVAS CLICK TO ADD TEXT
+        // CANVAS CLICK TO REPOSITION TEXT
         // ============================================
         canvas.addEventListener('click', function(e) {
-            const text = document.getElementById('textInput').value.trim();
-            if (!text) {
+            if (!liveTextSettings.text) {
                 return;
             }
 
@@ -376,20 +430,10 @@
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            const fontSize = parseInt(document.getElementById('fontSizeInput').value);
-            const color = document.getElementById('textColorInput').value;
-
-            ctx.font = `${fontSize}px Arial`;
-            ctx.fillStyle = color;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(text, x, y);
-
-            // Store text element
-            textElements.push({ text, fontSize, color, x, y });
-
-            // Clear input
-            document.getElementById('textInput').value = '';
+            // Update live text position
+            liveTextSettings.x = x;
+            liveTextSettings.y = y;
+            redrawCanvas();
         });
 
         // ============================================

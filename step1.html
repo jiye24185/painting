@@ -104,24 +104,21 @@
         }
 
         .canvas-star {
-            width: 0;
-            height: 0;
-            position: relative;
-            border-left: 35px solid transparent;
-            border-right: 35px solid transparent;
-            border-bottom: 70px solid #000;
-        }
-
-        .canvas-star::before {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 35px solid transparent;
-            border-right: 35px solid transparent;
-            border-top: 70px solid #000;
-            top: 30px;
-            left: -35px;
+            width: 70px;
+            height: 70px;
+            background: #000;
+            clip-path: polygon(
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
+            );
         }
 
         .canvas-circle {

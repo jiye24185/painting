@@ -344,13 +344,13 @@
         const settings = JSON.parse(localStorage.getItem('brushSettings'));
 
         // Redirect to step 1 if settings are incomplete
-        if (!settings || !settings.canvasShape || !settings.paperColor) {
+        if (!settings || !settings.canvasShape || !settings.paperTexture) {
             window.location.href = 'step1.html';
         }
 
         // Display canvas information
         document.getElementById('infoCanvas').textContent = settings.canvasShapeName;
-        document.getElementById('infoPaper').textContent = settings.paperName;
+        document.getElementById('infoPaper').textContent = settings.paperTextureName;
 
         // ============================================
         // CANVAS SETUP
@@ -361,8 +361,18 @@
         // Apply canvas shape clip-path
         canvas.classList.add('shape-' + settings.canvasShape);
 
-        // Set canvas background to paper color
-        canvas.style.background = settings.paperColor;
+        // Set canvas background to paper texture
+        const textureMap = {
+            'Texturelabs_Paper_150S.jpg': 'linear-gradient(135deg, #D4A574 0%, #C89968 50%, #B8865F 100%)',
+            'Texturelabs_Paper_237S.jpg': 'linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 50%, #F0F0F0 100%)',
+            'Texturelabs_Paper_300S.jpg': 'linear-gradient(0deg, transparent 24%, rgba(0, 0, 0, .05) 25%, rgba(0, 0, 0, .05) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, .05) 75%, rgba(0, 0, 0, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 0, 0, .05) 25%, rgba(0, 0, 0, .05) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, .05) 75%, rgba(0, 0, 0, .05) 76%, transparent 77%, transparent)'
+        };
+
+        canvas.style.background = textureMap[settings.paperTexture] || '#FFFFFF';
+        if (settings.paperTexture === 'Texturelabs_Paper_300S.jpg') {
+            canvas.style.backgroundSize = '25px 25px';
+            canvas.style.backgroundColor = '#F5F5F5';
+        }
 
         // ============================================
         // DRAWING STATE
@@ -520,8 +530,13 @@
             tempCanvas.height = canvas.height;
             const tempCtx = tempCanvas.getContext('2d');
 
-            // Fill with paper color
-            tempCtx.fillStyle = settings.paperColor;
+            // Apply texture background
+            const textureColors = {
+                'Texturelabs_Paper_150S.jpg': '#C89968',
+                'Texturelabs_Paper_237S.jpg': '#F8F8F8',
+                'Texturelabs_Paper_300S.jpg': '#F5F5F5'
+            };
+            tempCtx.fillStyle = textureColors[settings.paperTexture] || '#FFFFFF';
             tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
             // Draw the actual canvas content

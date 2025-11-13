@@ -66,6 +66,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             margin: 0 0 40px 0;
+            overflow: visible;
         }
 
         .option-card {
@@ -94,10 +95,15 @@
             height: 120px;
             margin-bottom: 12px;
             border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 4px;
             background-size: cover;
             background-position: center;
-            overflow: visible;
+        }
+
+        /* Remove border-radius for shaped previews */
+        .texture-preview.shape-circle,
+        .texture-preview.shape-star,
+        .texture-preview.shape-heart {
+            border: none;
         }
 
         .texture-tan {
@@ -122,26 +128,39 @@
         }
 
         .texture-preview.shape-circle {
-            clip-path: circle(50%);
+            clip-path: circle(45% at 50% 50%);
         }
 
         .texture-preview.shape-star {
             clip-path: polygon(
-                50% 0%,
-                61% 35%,
-                98% 35%,
-                68% 57%,
-                79% 91%,
-                50% 70%,
-                21% 91%,
-                32% 57%,
-                2% 35%,
-                39% 35%
+                50% 5%,
+                61% 38%,
+                95% 38%,
+                68% 58%,
+                79% 92%,
+                50% 72%,
+                21% 92%,
+                32% 58%,
+                5% 38%,
+                39% 38%
             );
         }
 
         .texture-preview.shape-heart {
-            clip-path: path('M 250,100 C 200,50 100,50 100,150 C 100,250 250,350 250,350 C 250,350 400,250 400,150 C 400,50 300,50 250,100');
+            clip-path: polygon(
+                50% 90%,
+                20% 60%,
+                10% 40%,
+                10% 25%,
+                25% 10%,
+                40% 10%,
+                50% 20%,
+                60% 10%,
+                75% 10%,
+                90% 25%,
+                90% 40%,
+                80% 60%
+            );
         }
 
         .option-label {

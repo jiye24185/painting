@@ -94,6 +94,29 @@
             margin: 0 auto 12px auto;
             background-size: cover;
             background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .texture-preview.shape-square {
+            width: 50px;
+            height: 50px;
+        }
+
+        .texture-preview.shape-circle {
+            width: 50px;
+            height: 50px;
+        }
+
+        .texture-preview.shape-star {
+            width: 50px;
+            height: 50px;
+        }
+
+        .texture-preview.shape-heart {
+            width: 50px;
+            height: 45px;
         }
 
         .texture-tan {
@@ -123,21 +146,34 @@
 
         .texture-preview.shape-star {
             clip-path: polygon(
-                50% 0%,
-                61% 35%,
-                98% 35%,
-                68% 57%,
-                79% 91%,
-                50% 70%,
-                21% 91%,
-                32% 57%,
-                2% 35%,
-                39% 35%
+                50% 5%,
+                61% 40%,
+                98% 40%,
+                68% 62%,
+                79% 95%,
+                50% 75%,
+                21% 95%,
+                32% 62%,
+                2% 40%,
+                39% 40%
             );
         }
 
         .texture-preview.shape-heart {
-            clip-path: path('M 25,10 C 20,5 10,5 10,15 C 10,25 25,35 25,35 C 25,35 40,25 40,15 C 40,5 30,5 25,10');
+            clip-path: polygon(
+                50% 85%,
+                20% 55%,
+                10% 35%,
+                10% 25%,
+                20% 15%,
+                35% 15%,
+                50% 25%,
+                65% 15%,
+                80% 15%,
+                90% 25%,
+                90% 35%,
+                80% 55%
+            );
         }
 
         .option-label {

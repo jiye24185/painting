@@ -23,30 +23,30 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
         }
 
         .canvas-header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .canvas-title {
             font-size: 24px;
             color: #000;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             font-weight: 600;
         }
 
-        .brush-info {
+        .canvas-info {
             display: flex;
             justify-content: center;
             gap: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
 
-        .brush-info-item {
+        .info-item {
             background: #f5f5f5;
             padding: 6px 12px;
             border-radius: 4px;
@@ -54,11 +54,133 @@
             color: #666;
         }
 
-        .brush-info-item strong {
+        .info-item strong {
             color: #000;
             font-weight: 500;
         }
 
+        /* Drawing Tools */
+        .tools-container {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .tools-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tool-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #000;
+        }
+
+        /* Tool Buttons */
+        .tool-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tool-btn {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .tool-btn:hover {
+            border-color: #000;
+        }
+
+        .tool-btn.active {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        /* Color Palette */
+        .color-palette {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .color-swatch.active {
+            border-color: #000;
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
+        }
+
+        /* Size Slider */
+        .size-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .size-slider {
+            width: 120px;
+            height: 4px;
+            border-radius: 2px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #000;
+            cursor: pointer;
+        }
+
+        .size-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #000;
+            cursor: pointer;
+            border: none;
+        }
+
+        .size-value {
+            font-size: 13px;
+            color: #666;
+            min-width: 30px;
+        }
+
+        /* Canvas */
         #paintCanvas {
             display: block;
             margin: 0 auto;
@@ -98,11 +220,12 @@
             height: 450px;
         }
 
+        /* Action Buttons */
         .canvas-controls {
             display: flex;
             justify-content: center;
             gap: 12px;
-            margin-top: 24px;
+            margin-top: 16px;
             flex-wrap: wrap;
         }
 
@@ -117,43 +240,28 @@
             background: #fff;
         }
 
-        .btn-reset {
-            color: #000;
-        }
-
-        .btn-reset:hover {
+        .btn:hover {
             border-color: #000;
         }
 
-        .btn-save {
-            color: #000;
-        }
-
-        .btn-save:hover {
-            border-color: #000;
-        }
-
-        .btn-restart {
-            color: #000;
-        }
-
-        .btn-restart:hover {
-            border-color: #000;
-        }
-
-        .btn-change {
+        .btn-primary {
             background: #000;
             color: #fff;
             border-color: #000;
         }
 
-        .btn-change:hover {
+        .btn-primary:hover {
             background: #333;
         }
 
         @media (max-width: 600px) {
             .container {
                 padding: 0;
+            }
+
+            .tools-row {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
             #paintCanvas {
@@ -171,18 +279,50 @@
     <div class="container">
         <div class="canvas-header">
             <h2 class="canvas-title">Start creating your masterpiece</h2>
-            <div class="brush-info">
-                <div class="brush-info-item">
+            <div class="canvas-info">
+                <div class="info-item">
                     <strong>Canvas:</strong> <span id="infoCanvas">-</span>
                 </div>
-                <div class="brush-info-item">
-                    <strong>Brush Color:</strong> <span id="infoColor">-</span>
+                <div class="info-item">
+                    <strong>Paper:</strong> <span id="infoPaper">-</span>
                 </div>
-                <div class="brush-info-item">
-                    <strong>Brush Shape:</strong> <span id="infoShape">-</span>
+            </div>
+        </div>
+
+        <!-- Drawing Tools -->
+        <div class="tools-container">
+            <div class="tools-row">
+                <!-- Tool Selection -->
+                <div class="tool-group">
+                    <span class="tool-label">Tool:</span>
+                    <div class="tool-buttons">
+                        <button class="tool-btn active" id="btnBrush">Brush</button>
+                        <button class="tool-btn" id="btnEraser">Eraser</button>
+                    </div>
                 </div>
-                <div class="brush-info-item">
-                    <strong>Paper Color:</strong> <span id="infoPaper">-</span>
+
+                <!-- Color Palette -->
+                <div class="tool-group">
+                    <span class="tool-label">Color:</span>
+                    <div class="color-palette">
+                        <div class="color-swatch active" data-color="#000000" style="background: #000000;"></div>
+                        <div class="color-swatch" data-color="#FF6B35" style="background: #FF6B35;"></div>
+                        <div class="color-swatch" data-color="#0077BE" style="background: #0077BE;"></div>
+                        <div class="color-swatch" data-color="#6BBF59" style="background: #6BBF59;"></div>
+                        <div class="color-swatch" data-color="#FFD700" style="background: #FFD700;"></div>
+                        <div class="color-swatch" data-color="#9B59B6" style="background: #9B59B6;"></div>
+                        <div class="color-swatch" data-color="#E74C3C" style="background: #E74C3C;"></div>
+                        <div class="color-swatch" data-color="#8B4513" style="background: #8B4513;"></div>
+                    </div>
+                </div>
+
+                <!-- Size Control -->
+                <div class="tool-group">
+                    <span class="tool-label">Size:</span>
+                    <div class="size-control">
+                        <input type="range" class="size-slider" id="sizeSlider" min="1" max="50" value="20">
+                        <span class="size-value" id="sizeValue">20</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,77 +330,107 @@
         <canvas id="paintCanvas" width="500" height="500"></canvas>
 
         <div class="canvas-controls">
-            <button class="btn btn-reset" id="btnReset">Clear Canvas</button>
-            <button class="btn btn-save" id="btnSave">Save Drawing</button>
-            <button class="btn btn-restart" id="btnRestart">Restart</button>
-            <button class="btn btn-change" id="btnChange">Change Brush</button>
+            <button class="btn" id="btnClear">Clear Canvas</button>
+            <button class="btn" id="btnSave">Save Drawing</button>
+            <button class="btn" id="btnRestart">Restart</button>
+            <button class="btn btn-primary" id="btnChange">Change Settings</button>
         </div>
     </div>
 
     <script>
         // ============================================
-        // LOAD BRUSH SETTINGS FROM LOCALSTORAGE
+        // LOAD SETTINGS FROM LOCALSTORAGE
         // ============================================
-        const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
+        const settings = JSON.parse(localStorage.getItem('brushSettings'));
 
-        // Redirect to step 1 if brush settings are incomplete
-        if (!brushSettings || !brushSettings.canvasShape || !brushSettings.color || !brushSettings.shape || !brushSettings.paperColor) {
+        // Redirect to step 1 if settings are incomplete
+        if (!settings || !settings.canvasShape || !settings.paperColor) {
             window.location.href = 'step1.html';
         }
 
-        // Display brush information
-        document.getElementById('infoCanvas').textContent = brushSettings.canvasShapeName;
-        document.getElementById('infoColor').textContent = brushSettings.colorName;
-        document.getElementById('infoShape').textContent =
-            brushSettings.shape.charAt(0).toUpperCase() + brushSettings.shape.slice(1);
-        document.getElementById('infoPaper').textContent = brushSettings.paperName;
+        // Display canvas information
+        document.getElementById('infoCanvas').textContent = settings.canvasShapeName;
+        document.getElementById('infoPaper').textContent = settings.paperName;
 
         // ============================================
-        // CANVAS DRAWING IMPLEMENTATION
+        // CANVAS SETUP
         // ============================================
         const canvas = document.getElementById('paintCanvas');
         const ctx = canvas.getContext('2d');
 
         // Apply canvas shape clip-path
-        canvas.classList.add('shape-' + brushSettings.canvasShape);
+        canvas.classList.add('shape-' + settings.canvasShape);
 
         // Set canvas background to paper color
-        canvas.style.background = brushSettings.paperColor;
+        canvas.style.background = settings.paperColor;
 
+        // ============================================
+        // DRAWING STATE
+        // ============================================
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
-
-        // Brush size configuration
-        const brushSize = 20;
+        let currentTool = 'brush'; // 'brush' or 'eraser'
+        let currentColor = '#000000';
+        let brushSize = 20;
 
         // ============================================
-        // EVENT LISTENERS
+        // TOOL CONTROLS
+        // ============================================
+        // Tool selection
+        document.getElementById('btnBrush').addEventListener('click', function() {
+            currentTool = 'brush';
+            this.classList.add('active');
+            document.getElementById('btnEraser').classList.remove('active');
+            canvas.style.cursor = 'crosshair';
+        });
+
+        document.getElementById('btnEraser').addEventListener('click', function() {
+            currentTool = 'eraser';
+            this.classList.add('active');
+            document.getElementById('btnBrush').classList.remove('active');
+            canvas.style.cursor = 'default';
+        });
+
+        // Color selection
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                currentColor = this.dataset.color;
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Size slider
+        const sizeSlider = document.getElementById('sizeSlider');
+        const sizeValue = document.getElementById('sizeValue');
+
+        sizeSlider.addEventListener('input', function() {
+            brushSize = parseInt(this.value);
+            sizeValue.textContent = brushSize;
+        });
+
+        // ============================================
+        // DRAWING EVENT LISTENERS
         // ============================================
         // Mouse events
-        canvas.addEventListener('mousedown', startDrawingEvent);
+        canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseout', stopDrawing);
 
-        // Touch events for mobile devices
+        // Touch events
         canvas.addEventListener('touchstart', handleTouchStart);
         canvas.addEventListener('touchmove', handleTouchMove);
         canvas.addEventListener('touchend', stopDrawing);
 
-        /**
-         * Starts drawing when mouse button is pressed
-         */
-        function startDrawingEvent(e) {
+        function startDrawing(e) {
             isDrawing = true;
             const rect = canvas.getBoundingClientRect();
             lastX = e.clientX - rect.left;
             lastY = e.clientY - rect.top;
         }
 
-        /**
-         * Handles touch start event
-         */
         function handleTouchStart(e) {
             e.preventDefault();
             isDrawing = true;
@@ -270,9 +440,6 @@
             lastY = touch.clientY - rect.top;
         }
 
-        /**
-         * Handles touch move event
-         */
         function handleTouchMove(e) {
             e.preventDefault();
             if (!isDrawing) return;
@@ -282,21 +449,15 @@
             const x = touch.clientX - rect.left;
             const y = touch.clientY - rect.top;
 
-            drawBrushStroke(x, y);
+            drawLine(x, y);
             lastX = x;
             lastY = y;
         }
 
-        /**
-         * Stops drawing when mouse button is released
-         */
         function stopDrawing() {
             isDrawing = false;
         }
 
-        /**
-         * Main drawing function called on mouse/touch move
-         */
         function draw(e) {
             if (!isDrawing) return;
 
@@ -304,105 +465,69 @@
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            drawBrushStroke(x, y);
+            drawLine(x, y);
 
             lastX = x;
             lastY = y;
         }
 
-        /**
-         * Draws a brush stroke from last position to current position
-         * Applies the custom brush settings (color and shape)
-         */
-        function drawBrushStroke(x, y) {
-            // Calculate distance for interpolation (to create smooth lines)
+        function drawLine(x, y) {
+            // Calculate distance for smooth interpolation
             const distance = Math.sqrt((x - lastX) ** 2 + (y - lastY) ** 2);
-            const steps = Math.max(1, Math.floor(distance / 5));
+            const steps = Math.max(1, Math.floor(distance / 2));
 
-            // Draw interpolated stamps along the path
             for (let i = 0; i <= steps; i++) {
                 const t = i / steps;
                 const interpX = lastX + (x - lastX) * t;
                 const interpY = lastY + (y - lastY) * t;
 
-                drawStamp(interpX, interpY);
+                if (currentTool === 'brush') {
+                    drawBrush(interpX, interpY);
+                } else {
+                    drawEraser(interpX, interpY);
+                }
             }
         }
 
-        /**
-         * Draw a brush stamp at the given position
-         */
-        function drawStamp(x, y) {
-            ctx.fillStyle = brushSettings.color;
-            ctx.globalAlpha = 0.8;
-            drawShape(x, y, brushSize);
-            ctx.globalAlpha = 1.0;
+        function drawBrush(x, y) {
+            ctx.fillStyle = currentColor;
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.beginPath();
+            ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+            ctx.fill();
         }
 
-        /**
-         * Draws the actual shape based on brush shape setting
-         * @param {number} x - X coordinate
-         * @param {number} y - Y coordinate
-         * @param {number} size - Size of the shape
-         */
-        function drawShape(x, y, size) {
-            ctx.save();
+        function drawEraser(x, y) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, brushSize / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+        }
 
-            switch (brushSettings.shape) {
-                case 'round':
-                    // Draw a circle
-                    ctx.beginPath();
-                    ctx.arc(x, y, size / 2, 0, Math.PI * 2);
-                    ctx.fill();
-                    break;
-
-                case 'angular':
-                    // Draw a triangle
-                    ctx.beginPath();
-                    ctx.moveTo(x, y - size / 2);
-                    ctx.lineTo(x - size / 2, y + size / 2);
-                    ctx.lineTo(x + size / 2, y + size / 2);
-                    ctx.closePath();
-                    ctx.fill();
-                    break;
-
-                case 'rectangle':
-                    // Draw a rectangle
-                    ctx.fillRect(x - size / 2, y - size / 2, size, size * 0.7);
-                    break;
+        // ============================================
+        // ACTION BUTTONS
+        // ============================================
+        document.getElementById('btnClear').addEventListener('click', () => {
+            if (confirm('Clear the entire canvas?')) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
             }
-
-            ctx.restore();
-        }
-
-        // ============================================
-        // BUTTON HANDLERS
-        // ============================================
-        /**
-         * Clear Canvas: Clear all drawings but keep the paper color
-         */
-        document.getElementById('btnReset').addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
         });
 
-        /**
-         * Save Drawing: Download the canvas as PNG image
-         */
         document.getElementById('btnSave').addEventListener('click', () => {
-            // Create a temporary canvas to merge background color with drawing
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = canvas.width;
             tempCanvas.height = canvas.height;
             const tempCtx = tempCanvas.getContext('2d');
 
             // Fill with paper color
-            tempCtx.fillStyle = brushSettings.paperColor;
+            tempCtx.fillStyle = settings.paperColor;
             tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-            // Draw the actual canvas content on top
+            // Draw the actual canvas content
             tempCtx.drawImage(canvas, 0, 0);
 
-            // Convert to blob and download
+            // Download
             tempCanvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
@@ -414,9 +539,6 @@
             });
         });
 
-        /**
-         * Restart: Clear localStorage and return to step 1
-         */
         document.getElementById('btnRestart').addEventListener('click', () => {
             if (confirm('This will clear your current drawing and start over. Are you sure?')) {
                 localStorage.removeItem('brushSettings');
@@ -424,9 +546,6 @@
             }
         });
 
-        /**
-         * Change Brush: Return to step 1 (keeping current settings)
-         */
         document.getElementById('btnChange').addEventListener('click', () => {
             window.location.href = 'step1.html';
         });

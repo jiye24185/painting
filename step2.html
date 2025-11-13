@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Step 2: Choose Brush Color</title>
+    <title>Step 2: Choose Paper Color</title>
     <style>
         * {
             margin: 0;
@@ -88,12 +88,12 @@
             padding: 23px 15px;
         }
 
-        .color-swatch {
+        .paper-swatch {
             width: 60px;
             height: 60px;
-            border-radius: 50%;
             margin: 0 auto 16px;
             border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 4px;
         }
 
         .option-label {
@@ -144,25 +144,23 @@
             <div class="step-indicator">
                 <div class="step-dot"></div>
                 <div class="step-dot active"></div>
-                <div class="step-dot"></div>
-                <div class="step-dot"></div>
             </div>
-            <h1 class="step-title">Choose your brush color</h1>
-            <p class="step-description">Select a color for your custom brush</p>
+            <h1 class="step-title">Choose your paper color</h1>
+            <p class="step-description">Select a background color for your canvas</p>
         </div>
 
         <div class="options-grid">
-            <div class="option-card" data-color="#FF6B35" data-name="Sunset Orange">
-                <div class="color-swatch" style="background: #FF6B35;"></div>
-                <div class="option-label">Sunset Orange</div>
+            <div class="option-card" data-paper="#FFFFFF" data-name="White">
+                <div class="paper-swatch" style="background: #FFFFFF;"></div>
+                <div class="option-label">White</div>
             </div>
-            <div class="option-card" data-color="#0077BE" data-name="Ocean Blue">
-                <div class="color-swatch" style="background: #0077BE;"></div>
-                <div class="option-label">Ocean Blue</div>
+            <div class="option-card" data-paper="#FFF8DC" data-name="Cream">
+                <div class="paper-swatch" style="background: #FFF8DC;"></div>
+                <div class="option-label">Cream</div>
             </div>
-            <div class="option-card" data-color="#6BBF59" data-name="Leaf Green">
-                <div class="color-swatch" style="background: #6BBF59;"></div>
-                <div class="option-label">Leaf Green</div>
+            <div class="option-card" data-paper="#E8E8E8" data-name="Light Gray">
+                <div class="paper-swatch" style="background: #E8E8E8;"></div>
+                <div class="option-label">Light Gray</div>
             </div>
         </div>
 
@@ -182,8 +180,8 @@
         // Handle option card clicks
         document.querySelectorAll('.option-card').forEach(card => {
             card.addEventListener('click', function() {
-                const color = this.dataset.color;
-                const colorName = this.dataset.name;
+                const paperColor = this.dataset.paper;
+                const paperName = this.dataset.name;
 
                 // Remove selected class from all cards
                 document.querySelectorAll('.option-card').forEach(c => {
@@ -193,23 +191,23 @@
                 // Add selected class to clicked card
                 this.classList.add('selected');
 
-                // Store color selection in localStorage
+                // Store paper color selection in localStorage
                 const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
-                brushSettings.color = color;
-                brushSettings.colorName = colorName;
+                brushSettings.paperColor = paperColor;
+                brushSettings.paperName = paperName;
                 localStorage.setItem('brushSettings', JSON.stringify(brushSettings));
 
-                // Navigate to step 3 after a brief delay
+                // Navigate to canvas after a brief delay
                 setTimeout(() => {
-                    window.location.href = 'step3.html';
+                    window.location.href = 'canvas.html';
                 }, 300);
             });
         });
 
-        // Restore previous selection if coming back from step 3
-        if (brushSettings.color) {
+        // Restore previous selection if coming back from canvas
+        if (brushSettings.paperColor) {
             document.querySelectorAll('.option-card').forEach(card => {
-                if (card.dataset.color === brushSettings.color) {
+                if (card.dataset.paper === brushSettings.paperColor) {
                     card.classList.add('selected');
                 }
             });

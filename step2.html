@@ -66,7 +66,6 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             margin: 0 0 40px 0;
-            overflow: visible;
         }
 
         .option-card {
@@ -77,7 +76,6 @@
             text-align: center;
             cursor: pointer;
             transition: border-color 0.2s ease;
-            overflow: visible;
         }
 
         .option-card:hover {
@@ -91,19 +89,11 @@
         }
 
         .texture-preview {
-            width: 100%;
-            height: 120px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(0,0,0,0.1);
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 12px auto;
             background-size: cover;
             background-position: center;
-        }
-
-        /* Remove border-radius for shaped previews */
-        .texture-preview.shape-circle,
-        .texture-preview.shape-star,
-        .texture-preview.shape-heart {
-            border: none;
         }
 
         .texture-tan {
@@ -128,39 +118,26 @@
         }
 
         .texture-preview.shape-circle {
-            clip-path: circle(45% at 50% 50%);
+            clip-path: circle(50%);
         }
 
         .texture-preview.shape-star {
             clip-path: polygon(
-                50% 5%,
-                61% 38%,
-                95% 38%,
-                68% 58%,
-                79% 92%,
-                50% 72%,
-                21% 92%,
-                32% 58%,
-                5% 38%,
-                39% 38%
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
             );
         }
 
         .texture-preview.shape-heart {
-            clip-path: polygon(
-                50% 90%,
-                20% 60%,
-                10% 40%,
-                10% 25%,
-                25% 10%,
-                40% 10%,
-                50% 20%,
-                60% 10%,
-                75% 10%,
-                90% 25%,
-                90% 40%,
-                80% 60%
-            );
+            clip-path: path('M 25,10 C 20,5 10,5 10,15 C 10,25 25,35 25,35 C 25,35 40,25 40,15 C 40,5 30,5 25,10');
         }
 
         .option-label {

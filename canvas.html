@@ -65,7 +65,6 @@
             border: 1px solid #e0e0e0;
             cursor: crosshair;
             touch-action: none;
-            background: white;
             max-width: 100%;
         }
 
@@ -93,6 +92,14 @@
         }
 
         .btn-reset:hover {
+            border-color: #000;
+        }
+
+        .btn-save {
+            color: #000;
+        }
+
+        .btn-save:hover {
             border-color: #000;
         }
 
@@ -128,13 +135,13 @@
             <h2 class="canvas-title">Start creating your masterpiece</h2>
             <div class="brush-info">
                 <div class="brush-info-item">
-                    <strong>Color:</strong> <span id="infoColor">-</span>
+                    <strong>Brush Color:</strong> <span id="infoColor">-</span>
                 </div>
                 <div class="brush-info-item">
-                    <strong>Shape:</strong> <span id="infoShape">-</span>
+                    <strong>Brush Shape:</strong> <span id="infoShape">-</span>
                 </div>
                 <div class="brush-info-item">
-                    <strong>Texture:</strong> <span id="infoTexture">-</span>
+                    <strong>Paper Color:</strong> <span id="infoPaper">-</span>
                 </div>
             </div>
         </div>
@@ -143,6 +150,7 @@
 
         <div class="canvas-controls">
             <button class="btn btn-reset" id="btnReset">Clear Canvas</button>
+            <button class="btn btn-save" id="btnSave">Save Drawing</button>
             <button class="btn btn-change" id="btnChange">Change Brush</button>
         </div>
     </div>
@@ -154,7 +162,7 @@
         const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
 
         // Redirect to step 1 if brush settings are incomplete
-        if (!brushSettings || !brushSettings.color || !brushSettings.shape || !brushSettings.texture) {
+        if (!brushSettings || !brushSettings.color || !brushSettings.shape || !brushSettings.paperColor) {
             window.location.href = 'step1.html';
         }
 
@@ -162,14 +170,16 @@
         document.getElementById('infoColor').textContent = brushSettings.colorName;
         document.getElementById('infoShape').textContent =
             brushSettings.shape.charAt(0).toUpperCase() + brushSettings.shape.slice(1);
-        document.getElementById('infoTexture').textContent =
-            brushSettings.texture.charAt(0).toUpperCase() + brushSettings.texture.slice(1);
+        document.getElementById('infoPaper').textContent = brushSettings.paperName;
 
         // ============================================
         // CANVAS DRAWING IMPLEMENTATION
         // ============================================
         const canvas = document.getElementById('paintCanvas');
         const ctx = canvas.getContext('2d');
+
+        // Set canvas background to paper color
+        canvas.style.background = brushSettings.paperColor;
 
         let isDrawing = false;
         let lastX = 0;
@@ -256,7 +266,7 @@
 
         /**
          * Draws a brush stroke from last position to current position
-         * Applies the custom brush settings (color, shape, texture)
+         * Applies the custom brush settings (color and shape)
          */
         function drawBrushStroke(x, y) {
             // Calculate distance for interpolation (to create smooth lines)
@@ -269,60 +279,17 @@
                 const interpX = lastX + (x - lastX) * t;
                 const interpY = lastY + (y - lastY) * t;
 
-                // Apply texture-specific rendering
-                switch (brushSettings.texture) {
-                    case 'smooth':
-                        drawSmoothStamp(interpX, interpY);
-                        break;
-                    case 'rough':
-                        drawRoughStamp(interpX, interpY);
-                        break;
-                    case 'dotted':
-                        // Only draw dots at intervals for dotted texture
-                        if (i % 3 === 0) {
-                            drawDottedStamp(interpX, interpY);
-                        }
-                        break;
-                }
+                drawStamp(interpX, interpY);
             }
         }
 
         /**
-         * SMOOTH TEXTURE: Normal brush with full opacity
+         * Draw a brush stamp at the given position
          */
-        function drawSmoothStamp(x, y) {
+        function drawStamp(x, y) {
             ctx.fillStyle = brushSettings.color;
             ctx.globalAlpha = 0.8;
             drawShape(x, y, brushSize);
-            ctx.globalAlpha = 1.0;
-        }
-
-        /**
-         * ROUGH TEXTURE: Varied opacity and jittered position for rough appearance
-         */
-        function drawRoughStamp(x, y) {
-            // Random opacity variation
-            ctx.globalAlpha = 0.3 + Math.random() * 0.4;
-            ctx.fillStyle = brushSettings.color;
-
-            // Draw multiple stamps with slight position jitter
-            for (let i = 0; i < 3; i++) {
-                const jitterX = x + (Math.random() - 0.5) * brushSize * 0.5;
-                const jitterY = y + (Math.random() - 0.5) * brushSize * 0.5;
-                const jitterSize = brushSize * (0.7 + Math.random() * 0.3);
-                drawShape(jitterX, jitterY, jitterSize);
-            }
-
-            ctx.globalAlpha = 1.0;
-        }
-
-        /**
-         * DOTTED TEXTURE: Spaced dots along the stroke path
-         */
-        function drawDottedStamp(x, y) {
-            ctx.fillStyle = brushSettings.color;
-            ctx.globalAlpha = 0.9;
-            drawShape(x, y, brushSize * 0.8);
             ctx.globalAlpha = 1.0;
         }
 
@@ -366,14 +333,43 @@
         // BUTTON HANDLERS
         // ============================================
         /**
-         * Reset Board: Clear the entire canvas
+         * Clear Canvas: Clear all drawings but keep the paper color
          */
         document.getElementById('btnReset').addEventListener('click', () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         });
 
         /**
-         * Change My Brush: Return to step 1
+         * Save Drawing: Download the canvas as PNG image
+         */
+        document.getElementById('btnSave').addEventListener('click', () => {
+            // Create a temporary canvas to merge background color with drawing
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Fill with paper color
+            tempCtx.fillStyle = brushSettings.paperColor;
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+            // Draw the actual canvas content on top
+            tempCtx.drawImage(canvas, 0, 0);
+
+            // Convert to blob and download
+            tempCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                link.download = `my-painting-${timestamp}.png`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            });
+        });
+
+        /**
+         * Change Brush: Return to step 1
          */
         document.getElementById('btnChange').addEventListener('click', () => {
             window.location.href = 'step1.html';

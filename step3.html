@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Step 3: Choose Texture</title>
+    <title>Step 3: Choose Paper Color</title>
     <style>
         * {
             margin: 0;
@@ -88,31 +88,12 @@
             padding: 23px 15px;
         }
 
-        .texture-preview {
+        .paper-swatch {
             width: 60px;
             height: 60px;
             margin: 0 auto 16px;
             border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .texture-smooth {
-            background: #000;
-        }
-
-        .texture-rough {
-            background: repeating-linear-gradient(
-                45deg,
-                #000,
-                #000 3px,
-                #666 3px,
-                #666 6px
-            );
-        }
-
-        .texture-dotted {
-            background: radial-gradient(circle, #000 1.5px, transparent 1.5px);
-            background-size: 10px 10px;
-            background-color: #fff;
+            border-radius: 4px;
         }
 
         .option-label {
@@ -165,22 +146,22 @@
                 <div class="step-dot"></div>
                 <div class="step-dot active"></div>
             </div>
-            <h1 class="step-title">Choose your brush texture</h1>
-            <p class="step-description">Select how your brush strokes will appear</p>
+            <h1 class="step-title">Choose your paper color</h1>
+            <p class="step-description">Select a background color for your canvas</p>
         </div>
 
         <div class="options-grid">
-            <div class="option-card" data-texture="smooth">
-                <div class="texture-preview texture-smooth"></div>
-                <div class="option-label">Smooth</div>
+            <div class="option-card" data-paper="#FFFFFF" data-name="White">
+                <div class="paper-swatch" style="background: #FFFFFF;"></div>
+                <div class="option-label">White</div>
             </div>
-            <div class="option-card" data-texture="rough">
-                <div class="texture-preview texture-rough"></div>
-                <div class="option-label">Rough / Dry</div>
+            <div class="option-card" data-paper="#FFF8DC" data-name="Cream">
+                <div class="paper-swatch" style="background: #FFF8DC;"></div>
+                <div class="option-label">Cream</div>
             </div>
-            <div class="option-card" data-texture="dotted">
-                <div class="texture-preview texture-dotted"></div>
-                <div class="option-label">Dotted</div>
+            <div class="option-card" data-paper="#E8E8E8" data-name="Light Gray">
+                <div class="paper-swatch" style="background: #E8E8E8;"></div>
+                <div class="option-label">Light Gray</div>
             </div>
         </div>
 
@@ -200,7 +181,8 @@
         // Handle option card clicks
         document.querySelectorAll('.option-card').forEach(card => {
             card.addEventListener('click', function() {
-                const texture = this.dataset.texture;
+                const paperColor = this.dataset.paper;
+                const paperName = this.dataset.name;
 
                 // Remove selected class from all cards
                 document.querySelectorAll('.option-card').forEach(c => {
@@ -210,9 +192,10 @@
                 // Add selected class to clicked card
                 this.classList.add('selected');
 
-                // Store texture selection in localStorage
+                // Store paper color selection in localStorage
                 const brushSettings = JSON.parse(localStorage.getItem('brushSettings'));
-                brushSettings.texture = texture;
+                brushSettings.paperColor = paperColor;
+                brushSettings.paperName = paperName;
                 localStorage.setItem('brushSettings', JSON.stringify(brushSettings));
 
                 // Navigate to canvas after a brief delay
@@ -223,9 +206,9 @@
         });
 
         // Restore previous selection if coming back from canvas
-        if (brushSettings.texture) {
+        if (brushSettings.paperColor) {
             document.querySelectorAll('.option-card').forEach(card => {
-                if (card.dataset.texture === brushSettings.texture) {
+                if (card.dataset.paper === brushSettings.paperColor) {
                     card.classList.add('selected');
                 }
             });

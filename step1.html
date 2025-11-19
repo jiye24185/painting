@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Step 1: Choose Canvas Shape</title>
+    <title>Step 1: Choose Letter Shape</title>
     <style>
         * {
             margin: 0;
@@ -26,9 +26,31 @@
             max-width: 800px;
         }
 
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-back-arrow {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+            margin-right: 16px;
+        }
+
+        .btn-back-arrow:hover {
+            border-color: #000;
+        }
+
         .step-header {
             text-align: center;
-            margin-bottom: 40px;
+            flex: 1;
+            margin-bottom: 20px;
         }
 
         .step-indicator {
@@ -177,13 +199,16 @@
 </head>
 <body>
     <div class="container">
-        <div class="step-header">
-            <div class="step-indicator">
-                <div class="step-dot active"></div>
-                <div class="step-dot"></div>
+        <div class="page-header">
+            <button class="btn-back-arrow" id="btnBack">← Back</button>
+            <div class="step-header">
+                <div class="step-indicator">
+                    <div class="step-dot active"></div>
+                    <div class="step-dot"></div>
+                </div>
+                <h1 class="step-title">Choose your letter shape</h1>
+                <p class="step-description">Select the shape of your drawing canvas</p>
             </div>
-            <h1 class="step-title">Choose your canvas shape</h1>
-            <p class="step-description">Select the shape of your drawing canvas</p>
         </div>
 
         <div class="options-grid">
@@ -261,6 +286,11 @@
                 }
             });
         }
+
+        // Back button handler
+        document.getElementById('btnBack').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
     </script>
 </body>
 </html>

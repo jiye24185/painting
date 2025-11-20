@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Your Card</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-back-arrow {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+            margin-right: 16px;
+        }
+
+        .btn-back-arrow:hover {
+            border-color: #000;
+        }
+
+        .save-header {
+            text-align: center;
+            flex: 1;
+        }
+
+        .save-title {
+            font-size: 24px;
+            color: #000;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .save-description {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Canvas Container */
+        .canvas-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        #previewCanvas {
+            display: block;
+            border: 1px solid #e0e0e0;
+            max-width: 100%;
+        }
+
+        /* Canvas shape clip paths */
+        #previewCanvas.shape-square {
+            clip-path: none;
+        }
+
+        #previewCanvas.shape-circle {
+            clip-path: circle(50%);
+        }
+
+        #previewCanvas.shape-star {
+            clip-path: polygon(
+                50% 0%,
+                61% 35%,
+                98% 35%,
+                68% 57%,
+                79% 91%,
+                50% 70%,
+                21% 91%,
+                32% 57%,
+                2% 35%,
+                39% 35%
+            );
+        }
+
+        #previewCanvas.shape-heart {
+            clip-path: path('M 250,100 C 200,50 100,50 100,150 C 100,250 250,350 250,350 C 250,350 400,250 400,150 C 400,50 300,50 250,100');
+            width: 500px;
+            height: 450px;
+        }
+
+        /* Action Buttons */
+        .action-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fff;
+        }
+
+        .btn:hover {
+            border-color: #000;
+        }
+
+        .btn-primary {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+        }
+
+        @media (max-width: 600px) {
+            .save-title {
+                font-size: 20px;
+            }
+
+            #previewCanvas {
+                width: 100% !important;
+                height: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <button class="btn-back-arrow" id="btnBackArrow">← Back</button>
+            <div class="save-header">
+                <h2 class="save-title">Save your card</h2>
+                <p class="save-description">Your card is ready to save</p>
+            </div>
+        </div>
+
+        <div class="canvas-wrapper">
+            <canvas id="previewCanvas" width="500" height="500"></canvas>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-controls">
+            <button class="btn btn-primary" id="btnSave">Save Card</button>
+            <button class="btn" id="btnRestart">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // LOAD SETTINGS AND FINAL CARD FROM LOCALSTORAGE
+        // ============================================
+        const settings = JSON.parse(localStorage.getItem('brushSettings'));
+        const finalCardData = localStorage.getItem('finalCard');
+
+        // Redirect to step 1 if settings are incomplete
+        if (!settings || !settings.canvasShape || !settings.paperTexture || !finalCardData) {
+            window.location.href = 'step1.html';
+        }
+
+        // ============================================
+        // CANVAS SETUP
+        // ============================================
+        const canvas = document.getElementById('previewCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Apply canvas shape clip-path
+        canvas.classList.add('shape-' + settings.canvasShape);
+
+        // Set canvas background texture
+        const textureMap = {
+            'Texturelabs_Paper_150S.jpg': 'linear-gradient(135deg, #D4A574 0%, #C89968 50%, #B8865F 100%)',
+            'Texturelabs_Paper_237S.jpg': 'linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 50%, #F0F0F0 100%)',
+            'Texturelabs_Paper_300S.jpg': 'linear-gradient(0deg, transparent 24%, rgba(0, 0, 0, .05) 25%, rgba(0, 0, 0, .05) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, .05) 75%, rgba(0, 0, 0, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 0, 0, .05) 25%, rgba(0, 0, 0, .05) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, .05) 75%, rgba(0, 0, 0, .05) 76%, transparent 77%, transparent)'
+        };
+
+        canvas.style.background = textureMap[settings.paperTexture] || '#FFFFFF';
+        if (settings.paperTexture === 'Texturelabs_Paper_300S.jpg') {
+            canvas.style.backgroundSize = '25px 25px';
+            canvas.style.backgroundColor = '#F5F5F5';
+        }
+
+        // Load the final card (drawing + text)
+        const img = new Image();
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+        };
+        img.src = finalCardData;
+
+        // ============================================
+        // ACTION BUTTONS
+        // ============================================
+        document.getElementById('btnBackArrow').addEventListener('click', () => {
+            window.location.href = 'text.html';
+        });
+
+        document.getElementById('btnSave').addEventListener('click', () => {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // Apply clipping path based on canvas shape
+            tempCtx.save();
+
+            const shape = settings.canvasShape;
+            if (shape === 'circle') {
+                // Circle clipping
+                tempCtx.beginPath();
+                tempCtx.arc(canvas.width / 2, canvas.height / 2, canvas.width / 2, 0, Math.PI * 2);
+                tempCtx.clip();
+            } else if (shape === 'star') {
+                // Star clipping - convert percentage polygon to absolute coordinates
+                const w = canvas.width;
+                const h = canvas.height;
+                const starPoints = [
+                    [0.50, 0.00], [0.61, 0.35], [0.98, 0.35], [0.68, 0.57],
+                    [0.79, 0.91], [0.50, 0.70], [0.21, 0.91], [0.32, 0.57],
+                    [0.02, 0.35], [0.39, 0.35]
+                ];
+                tempCtx.beginPath();
+                tempCtx.moveTo(starPoints[0][0] * w, starPoints[0][1] * h);
+                for (let i = 1; i < starPoints.length; i++) {
+                    tempCtx.lineTo(starPoints[i][0] * w, starPoints[i][1] * h);
+                }
+                tempCtx.closePath();
+                tempCtx.clip();
+            } else if (shape === 'heart') {
+                // Heart clipping using Path2D
+                const heartPath = new Path2D('M 250,100 C 200,50 100,50 100,150 C 100,250 250,350 250,350 C 250,350 400,250 400,150 C 400,50 300,50 250,100');
+                tempCtx.clip(heartPath);
+            }
+            // Square doesn't need clipping
+
+            // Apply texture background
+            const textureColors = {
+                'Texturelabs_Paper_150S.jpg': '#C89968',
+                'Texturelabs_Paper_237S.jpg': '#F8F8F8',
+                'Texturelabs_Paper_300S.jpg': '#F5F5F5'
+            };
+            tempCtx.fillStyle = textureColors[settings.paperTexture] || '#FFFFFF';
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+            // Draw the actual canvas content
+            tempCtx.drawImage(canvas, 0, 0);
+
+            tempCtx.restore();
+
+            // Download
+            tempCanvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+                link.download = `my-card-${timestamp}.png`;
+                link.href = url;
+                link.click();
+                URL.revokeObjectURL(url);
+            });
+        });
+
+        document.getElementById('btnRestart').addEventListener('click', () => {
+            if (confirm('This will clear your current work and start over. Are you sure?')) {
+                localStorage.removeItem('brushSettings');
+                localStorage.removeItem('canvasDrawing');
+                localStorage.removeItem('finalCard');
+                window.location.href = 'step1.html';
+            }
+        });
+    </script>
+</body>
+</html>
